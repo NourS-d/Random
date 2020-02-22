@@ -20,7 +20,6 @@ class Pendulum():
         # Bar Length
         self.bar_length = 1.5
 
-        
     def plot_pendulum(self,xt,theta, radians = True):
         
         # Clear figure
@@ -78,6 +77,23 @@ class Pendulum():
         plt.ylim([-1.1 * self.bar_length, SIZE - 1.1 * self.bar_length])
         plt.pause(0.01)
 
+    def update_cart_dims(self, width, height, wheel_radius):
+        if width <= 0 or height <= 0 or wheel_radius <= 0:
+            print("Please enter positive nonzero values.")
+            raise ValueError
+
+        self.base_height = height
+        self.base_width = width
+        self.wheel_radius = wheel_radius
+
+    def update_pendulum_dims(self, bar_length, ball_radius):
+        if bar_length <=0 or ball_radius <= 0:
+            print("Values must nonzero positives.")
+            raise ValueError
+
+        self.bar_length = bar_length
+        self.ball_radius = ball_radius
+        
 P= Pendulum()
 for x in range(0,50,1):
     x=x/10

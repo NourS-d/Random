@@ -4,21 +4,51 @@ import numpy as np
 SIZE = 10
 plt.rcParams["figure.figsize"] = (SIZE,SIZE)
 
+# Gravity
+g = 9.8  # [m/s^2]
+
 class Pendulum():
 
     def __init__(self):
         # Base Dimensions 
-        self.base_width = 1
-        self.base_height = 0.2
-
+        self.base_width = 1         # [m]
+        self.base_height = 0.2      # [m]
+        
         # Wheel Radius
-        self.wheel_radius = 0.1
+        self.wheel_radius = 0.1     # [m]
 
         # Ball Radius
-        self.ball_radius = 0.1
+        self.ball_radius = 0.1      # [m]
 
         # Bar Length
-        self.bar_length = 1.5
+        self.bar_length = 1.5       # [m]
+
+        # Cart Mass
+        self.M = 1                  # [kg]
+        
+        # Ball Mass
+        self.m = 0.2                # [kg]
+
+        # Time Step
+        self.dt = 0.001             # [s]
+
+    def model_matrix(self):
+        A = np.array([
+            [0, 1, 0, 0],
+            [0, 0, self.m * g / self.M, 0],
+            [0, 0, 0, 1],
+            [0, 0, g * (self.M + self.m) / (self.bar_length * self.M), 0]
+            ])
+
+        B = np.array([
+            [0],
+            [1 / self.M],
+            [0],
+            [1 / (self.bar_length * self.M)]
+            ])
+
+        return A, B
+
 
     def plot_pendulum(self,xt,theta, radians = True):
         
@@ -77,6 +107,7 @@ class Pendulum():
         plt.ylim([-1.1 * self.bar_length, SIZE - 1.1 * self.bar_length])
         plt.pause(0.01)
 
+# Paramter Update Functions
     def update_cart_dims(self, width, height, wheel_radius):
         if width <= 0 or height <= 0 or wheel_radius <= 0:
             print("Please enter positive nonzero values.")
@@ -93,8 +124,18 @@ class Pendulum():
 
         self.bar_length = bar_length
         self.ball_radius = ball_radius
+
+    def update_masses(self, cart_mass, ball_mass):
+        if cart_mass <= 0 or ball_mass <= 0:
+            print("Masses must be positive nonzero values.")
+            raise ValueError
         
+        self.M = cart_mass
+        self.m = ball_mass
+
 P= Pendulum()
-for x in range(0,50,1):
+
+print(P.model_matrix())
+for x in range(0,10,1):
     x=x/10
     P.plot_pendulum(x,0)

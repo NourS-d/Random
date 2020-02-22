@@ -4,71 +4,81 @@ import numpy as np
 SIZE = 10
 plt.rcParams["figure.figsize"] = (SIZE,SIZE)
 
-def plot_pendulum(xt,theta, radians = True):
+class Pendulum():
 
-    if not radians:
-        theta = np.radians(theta)
-    
-    # Base Dimensions 
-    base_width = 1
-    base_height = 0.2
+    def __init__(self):
+        # Base Dimensions 
+        self.base_width = 1
+        self.base_height = 0.2
 
-    # Wheel Radius
-    wheel_radius = 0.1
+        # Wheel Radius
+        self.wheel_radius = 0.1
 
-    # Ball Radius
-    ball_radius = 0.1
+        # Ball Radius
+        self.ball_radius = 0.1
 
-    # Bar Length
-    bar_length = 1.5
+        # Bar Length
+        self.bar_length = 1.5
 
-    # Model Coordiates
-    base_xy =[-base_width/2,base_height/2]  # Base coordiates
-    
-    wr_xy = [base_width/2 - wheel_radius, -base_height/2+wheel_radius]  # Right Wheel
-    wl_xy = [-base_width/2 + wheel_radius, -base_height/2+wheel_radius] # Left Wheel
+        
+    def plot_pendulum(self,xt,theta, radians = True):
+        
+        # Clear figure
+        plt.clf()
 
-    bar_xs = np.array([0, bar_length * np.sin(-theta)])
-    bar_ys = np.array([base_height, bar_length * np.cos(-theta) + base_height])
+        if not radians:
+            theta = np.radians(theta)
 
-    base_xy[0] += xt
-    wr_xy[0] += xt
-    wl_xy[0] += xt
-    bar_xs += [xt,xt]
-    
-    # Model Shapes and Plot
-    # Cart
-    base = plt.Rectangle(base_xy, base_width, base_height,
-                        fc="#073642",
-                        ec="#2E3436")
+        # Model Coordiates
+        base_xy =[-self.base_width/2, self.base_height/2]  # Base coordiates
+        
+        wr_xy = [self.base_width/2 - self.wheel_radius, -self.base_height/2+self.wheel_radius]  # Right Wheel
+        wl_xy = [-self.base_width/2 + self.wheel_radius, -self.base_height/2+self.wheel_radius] # Left Wheel
 
-    wheel_r = plt.Circle(wr_xy, wheel_radius,
-                        fc="#469EBD",
-                        ec="#469EBD",
-                        )
-    wheel_l = plt.Circle(wl_xy, wheel_radius,
-                        fc="#469EBD",
-                        ec="#469EBD",
-                        )
-    plt.gca().add_patch(base)
-    plt.gca().add_patch(wheel_l)
-    plt.gca().add_patch(wheel_r)
+        bar_xs = np.array([0, self.bar_length * np.sin(-theta)])
+        bar_ys = np.array([self.base_height, self.bar_length * np.cos(-theta) + self.base_height])
 
-    # Pendulum
-    ball = plt.Circle((bar_xs[1], bar_ys[1]), ball_radius,
-                        zorder=10,
-                        fc="#FFA000",
-                        )
-    pendulum_bar = plt.plot(bar_xs,bar_ys,
-                            c="#CB1616",
-                            lw=3,
+        base_xy[0] += xt
+        wr_xy[0] += xt
+        wl_xy[0] += xt
+        bar_xs += [xt,xt]
+        
+        # Model Shapes and Plot
+        # Cart
+        base = plt.Rectangle(base_xy, self.base_width, self.base_height,
+                            fc="#073642",
+                            ec="#2E3436")
+
+        wheel_r = plt.Circle(wr_xy, self.wheel_radius,
+                            fc="#469EBD",
+                            ec="#469EBD",
                             )
-    plt.gca().add_patch(ball)
+        wheel_l = plt.Circle(wl_xy, self.wheel_radius,
+                            fc="#469EBD",
+                            ec="#469EBD",
+                            )
+        plt.gca().add_patch(base)
+        plt.gca().add_patch(wheel_l)
+        plt.gca().add_patch(wheel_r)
+
+        # Pendulum
+        ball = plt.Circle((bar_xs[1], bar_ys[1]), self.ball_radius,
+                            zorder=10,
+                            fc="#FFA000",
+                            )
+        pendulum_bar = plt.plot(bar_xs,bar_ys,
+                                c="#CB1616",
+                                lw=3,
+                                )
+        plt.gca().add_patch(ball)
 
 
-    plt.axis("equal")
-    plt.xlim([-SIZE / 2, SIZE / 2])
-    plt.ylim([-1.1 * bar_length, SIZE - 1.1 * bar_length])
-    plt.show()
+        plt.axis("equal")
+        plt.xlim([-SIZE / 2, SIZE / 2])
+        plt.ylim([-1.1 * self.bar_length, SIZE - 1.1 * self.bar_length])
+        plt.pause(0.01)
 
-plot_pendulum(1,0, False)
+P= Pendulum()
+for x in range(0,50,1):
+    x=x/10
+    P.plot_pendulum(x,0)

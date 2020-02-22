@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-SIZE = 10
+SIZE = 5
 plt.rcParams["figure.figsize"] = (SIZE,SIZE)
 
 # Gravity
@@ -12,7 +12,7 @@ class Pendulum():
     def __init__(self):
         # Base Dimensions 
         self.base_width = 1         # [m]
-        self.base_height = 0.2      # [m]
+        self.base_height = 0.5      # [m]
         
         # Wheel Radius
         self.wheel_radius = 0.1     # [m]
@@ -21,17 +21,18 @@ class Pendulum():
         self.ball_radius = 0.1      # [m]
 
         # Bar Length
-        self.bar_length = 1.5       # [m]
+        self.bar_length = 2         # [m]
 
         # Cart Mass
         self.M = 1                  # [kg]
         
         # Ball Mass
-        self.m = 0.2                # [kg]
+        self.m = 0.3                # [kg]
 
         # Time Step
-        self.dt = 0.001             # [s]
+        self.dt = 0.1             # [s]
 
+  # Simulation
     def model_matrix(self):
         A = np.array([
             [0, 1, 0, 0],
@@ -49,9 +50,16 @@ class Pendulum():
 
         return A, B
 
+    def run_step(self, x, u):
+        A, B = self.model_matrix()
+
+        x_dot = np.dot(A, x) + np.dot(B, u).reshape((4,1))        
+        x += self. dt * x_dot
+        return x
 
     def plot_pendulum(self,xt,theta, radians = True):
-        
+        plt.figure("Simulation")
+
         # Clear figure
         plt.clf()
 
@@ -61,8 +69,8 @@ class Pendulum():
         # Model Coordiates
         base_xy =[-self.base_width/2, self.base_height/2]  # Base coordiates
         
-        wr_xy = [self.base_width/2 - self.wheel_radius, -self.base_height/2+self.wheel_radius]  # Right Wheel
-        wl_xy = [-self.base_width/2 + self.wheel_radius, -self.base_height/2+self.wheel_radius] # Left Wheel
+        wr_xy = [self.base_width/2 - self.wheel_radius, abs(self.base_height/2-self.wheel_radius)]  # Right Wheel
+        wl_xy = [-self.base_width/2 + self.wheel_radius, abs(self.base_height/2-self.wheel_radius)] # Left Wheel
 
         bar_xs = np.array([0, self.bar_length * np.sin(-theta)])
         bar_ys = np.array([self.base_height, self.bar_length * np.cos(-theta) + self.base_height])
@@ -103,11 +111,15 @@ class Pendulum():
 
 
         plt.axis("equal")
-        plt.xlim([-SIZE / 2, SIZE / 2])
+        
+        if xt >SIZE or xt <-SIZE:
+            plt.xlim([-SIZE / 2 + xt, SIZE / 2 + xt])
+        else:
+            plt.xlim([-SIZE / 2, SIZE / 2 ])
         plt.ylim([-1.1 * self.bar_length, SIZE - 1.1 * self.bar_length])
-        plt.pause(0.01)
+        plt.pause(0.001)
 
-# Paramter Update Functions
+  # Paramter Update Functions
     def update_cart_dims(self, width, height, wheel_radius):
         if width <= 0 or height <= 0 or wheel_radius <= 0:
             print("Please enter positive nonzero values.")
@@ -133,9 +145,10 @@ class Pendulum():
         self.M = cart_mass
         self.m = ball_mass
 
-P= Pendulum()
+if __name__ == "__main__":
+    P= Pendulum()
 
-print(P.model_matrix())
-for x in range(0,10,1):
-    x=x/10
-    P.plot_pendulum(x,0)
+    print(P.model_matrix())
+    for x in range(0,10,1):
+        x=x/10
+        P.plot_pendulum(x,0)

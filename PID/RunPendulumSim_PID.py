@@ -6,7 +6,7 @@ from PID import PID_Control
 if __name__ =="__main__":
 
     P = pendulum.Pendulum()
-    PID = PID_Control(50,0,1) # Some values for Kp, Ki and Kd
+    PID = PID_Control(150,2,10) # Some values for Kp, Ki and Kd
 
     # Initial Condition
     X  = np.array([ [0],

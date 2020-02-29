@@ -74,7 +74,46 @@ class UFO():
             [-0.54, 0.06],
             [0.54, 0.06],
             ])
+        
+        # System Dynamic Model
+        self._A = np.array( [[0.0, 1],
+                             [0.1, 0]
+                             ])
+        self._B = np.array([[0],[1]])
+        self._C = np.array( [1, 0])
+        self._D = np.array([0])
+    def get_model(self):
+        """Return the state space model of the system (A,B,C,D)
+        
+        """
+        return self._A, self._B, self._C, self._D
+    def update_model(self, A=None, B=None, C=None, D=None):
+        """
+        Updates the state space model.
+        """
+        self._A = self._check_update_matrix(self._A, A)
+        self._B = self._check_update_matrix(self._B, B)
+        self._C = self._check_update_matrix(self._C, C)
+        self._D = self._check_update_matrix(self._D, D)
 
+        print("New model: \n")
+        self.print_ss()
+        
+    def _check_update_matrix(self, A0, A1):
+        if A1 is not None:
+            A1 = np.array(A1)
+            if A1.shape == A0.shape:
+                return A1
+            else:
+                print("The following matrix has the wrong shape: ")
+                print(A1)
+                print("Please make sure it is of shape ", A0.shape)
+        return A0
+
+    def print_ss(self):
+        print("A=\n{}\n\nB=\n{}\n\nC=\n{}\n\nD=\n{}\n".format(self._A, self._B,
+                                                            self._C ,self._D))
+        
     def plot_ufo(self, alpha, xy, degrees = False):
         plt.figure("Simulation")
         plt.clf()

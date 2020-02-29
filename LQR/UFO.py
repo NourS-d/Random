@@ -126,7 +126,7 @@ class UFO():
         print("A=\n{}\n\nB=\n{}\n\nC=\n{}\n\nD=\n{}\n".format(self._A, self._B,
                                                             self._C ,self._D))
         
-    def plot_ufo(self, alpha, xy = [0, 1.5], degrees = False):
+    def plot_ufo(self, alpha, xy = [0, 4.5], degrees = False):
         plt.figure("Simulation")
         plt.clf()
         
@@ -148,8 +148,12 @@ class UFO():
         plt.fill(ufo_x,ufo_y)
         plt.axis("equal")
         plt.xlim([-SIZE / 2, SIZE / 2])
+        plt.ylim([-1, SIZE + 1])
         plt.pause(0.001)
 
 if __name__ == "__main__":
     ufo = UFO()
-    ufo.plot_ufo(0.3,[1,2])
+    ufo.plot_ufo(np.pi/2,[1,2])
+    plt.show()
+    ufo.plot_ufo(0,[1,2])
+    plt.show()

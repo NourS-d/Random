@@ -82,11 +82,23 @@ class UFO():
         self._B = np.array([[0],[1]])
         self._C = np.array( [1, 0])
         self._D = np.array([0])
+
+        self.dt = 0.05
+
+    def run_step(self, x, u):
+        
+        x_dot = np.dot(self._A, x) + np.dot(self._B, u)
+        #y = np.dot(self._C, x) + np.dot(self._C, u)
+
+        x += self.dt* x_dot
+        return x
+
     def get_model(self):
         """Return the state space model of the system (A,B,C,D)
         
         """
         return self._A, self._B, self._C, self._D
+
     def update_model(self, A=None, B=None, C=None, D=None):
         """
         Updates the state space model.
@@ -98,7 +110,7 @@ class UFO():
 
         print("New model: \n")
         self.print_ss()
-        
+
     def _check_update_matrix(self, A0, A1):
         if A1 is not None:
             A1 = np.array(A1)
@@ -114,7 +126,7 @@ class UFO():
         print("A=\n{}\n\nB=\n{}\n\nC=\n{}\n\nD=\n{}\n".format(self._A, self._B,
                                                             self._C ,self._D))
         
-    def plot_ufo(self, alpha, xy, degrees = False):
+    def plot_ufo(self, alpha, xy = [0, 1.5], degrees = False):
         plt.figure("Simulation")
         plt.clf()
         
@@ -133,10 +145,11 @@ class UFO():
         ufo_y = np.dot(self.__ufo_data, rot[1,:]) + y
         
         # Plot UFO
+        plt.fill(ufo_x,ufo_y)
         plt.axis("equal")
         plt.xlim([-SIZE / 2, SIZE / 2])
-        plt.fill(ufo_x,ufo_y)
-        plt.show()
+        plt.pause(0.001)
 
-ufo = UFO()
-ufo.plot_ufo(0.3,[1,2])
+if __name__ == "__main__":
+    ufo = UFO()
+    ufo.plot_ufo(0.3,[1,2])

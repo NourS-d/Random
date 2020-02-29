@@ -7,6 +7,8 @@ plt.rcParams["figure.figsize"] = (SIZE,SIZE)
 # on the MathWorks page
 # https://www.mathworks.com/videos/state-space-part-4-what-is-lqr-control-1551955957637.html
 
+SCALE =0.285
+
 class UFO():
     def __init__(self):
         
@@ -85,12 +87,24 @@ class UFO():
 
         self.dt = 0.05
 
+        # Fuel Level
+        self.fuel = 0
+
     def run_step(self, x, u):
-        
+        x0 = x[1,0] # nitial velocity
+        print(x0)
         x_dot = np.dot(self._A, x) + np.dot(self._B, u)
         #y = np.dot(self._C, x) + np.dot(self._C, u)
 
         x += self.dt* x_dot
+
+        x1 = x[1,0] # New velocity
+        
+        acc =  (x1 - x0)/self.dt
+
+        # Fuel is proportional to the integral of acceleration
+        self.fuel = self.fuel + SCALE * abs(acc)
+
         return x
 
     def get_model(self):
@@ -146,6 +160,7 @@ class UFO():
         
         # Plot UFO
         plt.fill(ufo_x,ufo_y)
+        plt.text(0,-0.5, "Fuel: {}".format(self.fuel))
         plt.axis("equal")
         plt.xlim([-SIZE / 2, SIZE / 2])
         plt.ylim([-1, SIZE + 1])

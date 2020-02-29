@@ -15,7 +15,7 @@ if __name__ == "__main__":
                     [0, 1]
                     ])
 
-    R = np.diag([0.1])
+    R = np.diag([1])
 
     lqr = LQR.LQR_Control(A,B,Q,R)
 

@@ -21,13 +21,13 @@ class Pendulum():
         self.ball_radius = 0.1      # [m]
 
         # Bar Length
-        self.bar_length = 2         # [m]
+        self.bar_length = 3         # [m]
 
         # Cart Mass
-        self.M = 1                  # [kg]
+        self.M = 10                  # [kg]
         
         # Ball Mass
-        self.m = 0.3                # [kg]
+        self.m = 2                # [kg]
 
         # Time Step
         self.dt = 0.1             # [s]
@@ -112,11 +112,8 @@ class Pendulum():
 
         plt.axis("equal")
         
-        if xt >SIZE or xt <-SIZE:
-            plt.xlim([-SIZE / 2 + xt, SIZE / 2 + xt])
-        else:
-            plt.xlim([-SIZE / 2, SIZE / 2 ])
-        plt.ylim([-1.1 * self.bar_length, SIZE - 1.1 * self.bar_length])
+        plt.xlim([-SIZE / 2 + xt, SIZE / 2 + xt])
+
         plt.pause(0.001)
 
   # Paramter Update Functions

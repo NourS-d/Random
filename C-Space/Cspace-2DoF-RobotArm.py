@@ -3,12 +3,26 @@ import numpy as np
 from matplotlib.widgets import Button, RectangleSelector, PolygonSelector, EllipseSelector
 from matplotlib.patches import Rectangle, Polygon, Ellipse
 
+# Robot Arm Params
+L1 = 2
+L2 = 1.5
+
+# Resolution
+RES = 360
 
 class Canvas():
     def __init__(self):
         
         # List of Obstacles
         self.objects = []
+
+        # Robot Params
+        self.l1 = L1
+        self.l2 = L2
+
+        # C-space Matrix
+        self.image = np.zeros((RES,RES,3), dtype = np.uint8)
+        self.image.fill(255)
 
         # Figure
         self.fig = plt.figure("World", (7,7))
@@ -30,9 +44,22 @@ class Canvas():
         self.buttonR = Button(axbutton, 'Add Polygon')
         self.buttonR.on_clicked(self.drawPolygon)
 
+        axbutton = plt.axes([0.71, 0.01, 0.15, 0.035])  
+        self.buttonU = Button(axbutton, 'Show C-Space')
+        self.buttonU.on_clicked(self.updateCSpace)
 
         plt.show()
 
+    def updateCSpace(self, click):
+        fig = plt.figure("C-Space")
+        ax = fig.add_subplot(1, 1, 1)
+        ax.set_yticklabels([])
+        ax.set_xticklabels([])
+        plt.yticks((0, RES/2, RES-1), (r'0', r'180', r'360'), color='k', size=10)
+        plt.xticks((0, RES/2, RES-1), (r'0', r'180', r'360'), color='k', size=10)
+
+        plt.imshow(self.image,origin="lower")
+        plt.show()
     def drawRectangle(self, click):
         print("Click, hold, and draw to draw rectangle.\n\n")
         self.rs = RectangleSelector(self.ax, self._drawRectangleEvent,

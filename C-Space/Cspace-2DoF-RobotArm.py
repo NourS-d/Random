@@ -3,6 +3,14 @@ import numpy as np
 from matplotlib.widgets import Button, RectangleSelector, PolygonSelector, EllipseSelector
 from matplotlib.patches import Rectangle, Polygon, Ellipse
 
+"""
+Draws the C-Space of a 2 link robotic manipulator.
+
+Assumes the the robot doesn't collide with it's self
+and that the base of the robot is at (0,0)
+
+Positive angles are counter clockwise.
+"""
 # Robot Arm Params
 L1 = 2
 L2 = 1.5
@@ -10,6 +18,8 @@ L2 = 1.5
 # Resolution
 RES = 360
 
+
+LIMIT = 1.5 * (L1 + L2) 
 class Canvas():
     def __init__(self):
         
@@ -28,8 +38,8 @@ class Canvas():
         self.fig = plt.figure("World", (7,7))
 
         self.ax = plt.axes([0.1,0.1,0.785,0.785])
-        plt.xlim(-5,+5)
-        plt.ylim(-5,+5)
+        plt.xlim(-LIMIT,+LIMIT)
+        plt.ylim(-LIMIT,+LIMIT)
 
         # Buttons
         axbutton = plt.axes([0.51, 0.01, 0.15, 0.035])  
@@ -48,15 +58,47 @@ class Canvas():
         self.buttonU = Button(axbutton, 'Show C-Space')
         self.buttonU.on_clicked(self.updateCSpace)
 
+        c2 = plt.Circle((0,0),self.l1+self.l2,fill = 'grey', alpha=0.05)
+        c1 = plt.Circle((0,0),self.l1,fill = 'grey', alpha=0.1)
+        self.ax.add_artist(c1)
+        self.ax.add_artist(c2)
+        
         plt.show()
 
-    def updateCSpace(self, click):
+    def updateCSpace(self,click):
+        for patch in self.objects:
+            for i in range(RES):
+                a1 = i * 2 * np.pi / RES
+                x1 =  np.cos(a1) * self.l1;
+                y1 =  np.sin(a1) * self.l1;
+                pt1 = self.ax.transData.transform((x1,y1))
+                if patch.contains_point(pt1):
+                    self.image[:,i,0]= patch._facecolor[0]*255
+                    self.image[:,i,1]= patch._facecolor[1]*255
+                    self.image[:,i,2]= patch._facecolor[2]*255
+                else:
+                    for j in range(RES):
+                        a2 = (i+j) * 2 * np.pi / RES
+                        x2 =  x1 + np.cos(a2) * self.l2;
+                        y2 =  y1 + np.sin(a2) * self.l2;
+                        pt2 = self.ax.transData.transform((x2,y2))
+                        if patch.contains_point(pt2):
+                            self.image[j,i,0]= patch._facecolor[0]*255
+                            self.image[j,i,1]= patch._facecolor[1]*255
+                            self.image[j,i,2]= patch._facecolor[2]*255
+
+        self._drawCSPace()
+
+    def _drawCSPace(self):
         fig = plt.figure("C-Space")
         ax = fig.add_subplot(1, 1, 1)
+        
         ax.set_yticklabels([])
         ax.set_xticklabels([])
         plt.yticks((0, RES/2, RES-1), (r'0', r'180', r'360'), color='k', size=10)
         plt.xticks((0, RES/2, RES-1), (r'0', r'180', r'360'), color='k', size=10)
+        plt.xlabel("theta 1")
+        plt.ylabel("theta 2")
 
         plt.imshow(self.image,origin="lower")
         plt.show()

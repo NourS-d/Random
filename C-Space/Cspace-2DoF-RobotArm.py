@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.widgets import Button, RectangleSelector
-from matplotlib.patches import Rectangle
+from matplotlib.widgets import Button, RectangleSelector, PolygonSelector, EllipseSelector
+from matplotlib.patches import Rectangle, Polygon, Ellipse
 
 
 class Canvas():
@@ -17,9 +17,19 @@ class Canvas():
         plt.xlim(-5,+5)
         plt.ylim(-5,+5)
 
+        # Buttons
         axbutton = plt.axes([0.51, 0.01, 0.15, 0.035])  
         self.buttonP = Button(axbutton, 'Add Rectangle')
         self.buttonP.on_clicked(self.drawRectangle)
+
+        axbutton = plt.axes([0.31, 0.01, 0.15, 0.035])  
+        self.buttonC = Button(axbutton, 'Add Circle')
+        self.buttonC.on_clicked(self.drawCircle)
+
+        axbutton = plt.axes([0.11, 0.01, 0.15, 0.035])  
+        self.buttonR = Button(axbutton, 'Add Polygon')
+        self.buttonR.on_clicked(self.drawPolygon)
+
 
         plt.show()
 
@@ -34,11 +44,41 @@ class Canvas():
         x2, y2 = erelease.xdata, erelease.ydata
 
         rect = Rectangle( (min(x1,x2),min(y1,y2)), np.abs(x1-x2), np.abs(y1-y2) , color=np.random.rand(3,))
-        self.ax.add_patch(rect)
-        self.objects.append(rect)
+        self._addPatch(rect)
+
+    def drawCircle(self,click):
+        print("Click, hold, and drag to draw circle.\n\n")
+
+        self.rs = EllipseSelector(self.ax, self._drawCircleEvent,
+                        lineprops=dict(linewidth=1, alpha=0.6, color='k'),
+                        drawtype='box', useblit=False, button=[1])
+
+    def _drawCircleEvent(self,eclick,erelease):
+        x1, y1 = eclick.xdata, eclick.ydata
+        x2, y2 = erelease.xdata, erelease.ydata
+
+        el = Ellipse( ((x2+x1)/2.0,(y2+y1) /2.0), np.abs(x1-x2), np.abs(y1-y2) , color=np.random.rand(3,))
+        self._addPatch(el)
+
+    def drawPolygon(self,click):
+        print("Click somewhere on the screen to start drawing the polygon.\n\n")
+
+        self.rs = PolygonSelector(self.ax, self._drawPolygonEvent,markerprops=dict(markersize=1),
+                                    lineprops=dict(linewidth=1, alpha=0.6, color='k'))
+
+    def _drawPolygonEvent(self, points):
+        polygon = Polygon(np.array(points), color=np.random.rand(3,))
+        self._addPatch(polygon)
+    
+    def _addPatch(self, patch):
         del self.rs
 
-
+        # In case clicked without hold
+        if all(np.linalg.norm(x) == np.linalg.norm(patch.get_verts()[0]) for x in patch.get_verts()):
+            return
+        self.objects.append(patch)
+        self.ax.add_patch(patch)
+        print("You currently have {} obstacles.".format(len(self.objects)))
 
 if __name__ == "__main__":
     c = Canvas()
